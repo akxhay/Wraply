@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, render_template
+
 from .database import db
 from .routes.config_routes import config_bp
 from .routes.execute_routes import execute_bp
@@ -18,6 +19,6 @@ def create_app():
 
     @app.route("/")
     def home():
-        return "<h2>API Wrapper Running</h2><a href='/configs/ui'>Configs</a>"
+        return render_template("index.html")
 
     return app
