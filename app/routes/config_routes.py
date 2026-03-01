@@ -3,8 +3,10 @@ from flask import Blueprint, request, jsonify, render_template
 from ..crud import (
     create_config,
     get_all_configs,
+    toggle_config,
     update_config,
     delete_config,
+    clone_config
 )
 from ..utils import serialize_list
 
@@ -34,8 +36,26 @@ def update(id):
     config = update_config(id, request.json)
     return jsonify({"updated": config.id})
 
+@config_bp.route("/<int:id>/clone", methods=["POST"])
+def clone(id):
+    config = clone_config(id)
+
+    if not config:
+        return {"error": "Config not found"}, 404
+
+    return serialize_model(config)
+
 
 @config_bp.route("/<int:id>", methods=["DELETE"])
 def delete(id):
     delete_config(id)
     return jsonify({"status": "deleted"})
+
+@config_bp.route("/<int:id>/toggle", methods=["PATCH"])
+def toggle(id):
+    config = toggle_config(id)
+
+    if not config:
+        return {"error": "Not found"}, 404
+
+    return jsonify({"enabled": config.enabled})

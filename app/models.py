@@ -6,8 +6,7 @@ class APIConfig(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True)
-    base_url = db.Column(db.String(255))
-    endpoint = db.Column(db.String(255))
+    url = db.Column(db.String(500))
     method = db.Column(db.String(10))
     headers = db.Column(db.Text)
     auth_type = db.Column(db.String(50))

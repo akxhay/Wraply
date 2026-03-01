@@ -36,6 +36,48 @@
         textarea {
             font-family: monospace;
         }
+
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 44px;
+          height: 22px;
+        }
+
+        .switch input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          inset: 0;
+          background-color: #ef4444;
+          transition: .3s;
+          border-radius: 34px;
+        }
+
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 16px;
+          width: 16px;
+          left: 3px;
+          bottom: 3px;
+          background: white;
+          transition: .3s;
+          border-radius: 50%;
+        }
+
+        input:checked + .slider {
+          background-color: #22c55e;
+        }
+
+        input:checked + .slider:before {
+          transform: translateX(22px);
+        }
     </style>
 
 </head>
@@ -68,13 +110,15 @@
                     <td x-text="c.id"></td>
                     <td x-text="c.name"></td>
                     <td><span class="badge bg-dark" x-text="c.method"></span></td>
-                    <td x-text="c.endpoint"></td>
+                    <td x-text="c.url"></td>
 
                     <td>
-<span class="badge"
-      :class="c.enabled ? 'badge-enabled':'badge-disabled'"
-      x-text="c.enabled ? 'Enabled':'Disabled'">
-</span>
+                        <label class="switch">
+                            <input type="checkbox"
+                                   :checked="c.enabled"
+                                   @change="toggle(c)">
+                            <span class="slider"></span>
+                        </label>
                     </td>
 
                     <td>
@@ -86,7 +130,10 @@
 
                         <button class="btn btn-sm btn-outline-danger"
                                 @click="remove(c.id)">Delete</button>
-
+                        <button class="btn btn-sm btn-outline-secondary"
+                                @click="cloneConfig(c.id)">
+                            Clone
+                        </button>
                     </td>
                 </tr>
             </template>
@@ -110,8 +157,9 @@
             <div class="modal-body">
 
                 <input class="form-control mb-2" placeholder="Name" x-model="form.name">
-                <input class="form-control mb-2" placeholder="Base URL" x-model="form.base_url">
-                <input class="form-control mb-2" placeholder="Endpoint" x-model="form.endpoint">
+                <input class="form-control mb-2"
+                       placeholder="Full URL (https://api.example.com/users)"
+                       x-model="form.url">
 
                 <select class="form-control mb-2" x-model="form.method">
                     <option>GET</option>
@@ -167,6 +215,13 @@
         this.form = JSON.parse(JSON.stringify(c));
         this.modal.show();
     },
+    async cloneConfig(id){
+        await fetch(`/configs/${id}/clone`, {
+            method:'POST'
+        });
+
+        this.fetchConfigs();
+    },
 
     async save(){
         let method = this.form.id ? 'PUT':'POST';
@@ -196,6 +251,13 @@
         });
 
         alert(JSON.stringify(await res.json(),null,2));
+    },
+    async toggle(config){
+        await fetch(`/configs/${config.id}/toggle`, {
+            method:'PATCH'
+        });
+
+        config.enabled = !config.enabled;
     }
 
     }

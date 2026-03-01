@@ -4,7 +4,6 @@ import asyncio
 
 
 async def execute_api(config, payload=None):
-    url = f"{config.base_url}{config.endpoint}"
 
     headers = {}
 
@@ -17,7 +16,7 @@ async def execute_api(config, payload=None):
     async with httpx.AsyncClient() as client:
         response = await client.request(
             config.method,
-            url,
+            config.url,
             json=payload,
             headers=headers,
             timeout=10,
