@@ -7,237 +7,820 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:      #0d0f14;
-      --surface: #13161e;
-      --border:  #252a38;
-      --accent:  #00e5ff;
-      --accent2: #7c3aed;
-      --success: #00c896;
-      --txt:     #e2e8f0;
-      --muted:   #64748b;
-      --mono:    'Space Mono', monospace;
-      --sans:    'DM Sans', sans-serif;
+      --bg:       #0d0f14;
+      --surface:  #13161e;
+      --surface2: #1a1e2a;
+      --border:   #252a38;
+      --accent:   #00e5ff;
+      --accent2:  #7c3aed;
+      --success:  #00c896;
+      --warn:     #f59e0b;
+      --danger:   #ff4560;
+      --txt:      #e2e8f0;
+      --muted:    #64748b;
+      --mono:     'Space Mono', monospace;
+      --sans:     'DM Sans', sans-serif;
+      --sidebar-w: 260px;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--txt); min-height: 100vh; display: flex; flex-direction: column; }
+    body::before { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px); pointer-events: none; z-index: 999; }
 
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--txt);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      overflow: hidden;
-    }
+    /* NAVBAR */
+    .navbar { position: sticky; top: 0; z-index: 100; background: rgba(13,15,20,.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 56px; flex-shrink: 0; }
+    .nav-brand { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--accent); letter-spacing: .06em; display: flex; align-items: center; gap: 10px; }
+    .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 6px var(--success); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-btn { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; padding: 8px 16px; border-radius: 7px; border: none; cursor: pointer; transition: all .2s; }
+    .nb-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .nb-ghost:hover { color: var(--txt); border-color: var(--muted); }
+    .nb-accent { background: var(--accent); color: #000; font-weight: 700; }
+    .nb-accent:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-    /* Scanline overlay */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent, transparent 2px,
-        rgba(0,0,0,.06) 2px, rgba(0,0,0,.06) 4px
-      );
-      pointer-events: none;
-      z-index: 10;
-    }
+    /* HERO */
+    .hero { position: relative; overflow: hidden; padding: 72px 28px 64px; text-align: center; border-bottom: 1px solid var(--border); }
+    .hg { position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none; }
+    .hg1 { width: 500px; height: 300px; background: radial-gradient(circle, rgba(0,229,255,.08), transparent 70%); top: -80px; left: 50%; transform: translateX(-50%); }
+    .hg2 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(124,58,237,.1), transparent 70%); bottom: -80px; right: 10%; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); background: rgba(0,229,255,.07); border: 1px solid rgba(0,229,255,.18); border-radius: 20px; padding: 5px 14px; margin-bottom: 22px; }
+    .hero h1 { font-family: var(--mono); font-size: clamp(28px, 5vw, 48px); font-weight: 700; line-height: 1.15; margin-bottom: 16px; }
+    .hero h1 .c { color: var(--accent); }
+    .hero p { font-size: 16px; color: var(--muted); max-width: 560px; margin: 0 auto 32px; line-height: 1.7; }
+    .hero-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .hero-stats { display: flex; align-items: center; justify-content: center; gap: 32px; margin-top: 48px; flex-wrap: wrap; }
+    .hero-stat .v { font-family: var(--mono); font-size: 24px; font-weight: 700; color: var(--accent); display: block; }
+    .hero-stat .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
 
-    /* Ambient glow blobs */
-    .glow-1, .glow-2 {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(120px);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .glow-1 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(0,229,255,.07), transparent 70%);
-      top: -100px; left: -100px;
-      animation: drift1 12s ease-in-out infinite;
-    }
-    .glow-2 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(124,58,237,.08), transparent 70%);
-      bottom: -80px; right: -80px;
-      animation: drift2 15s ease-in-out infinite;
-    }
-    @keyframes drift1 {
-      0%, 100% { transform: translate(0,0); }
-      50%       { transform: translate(40px, 30px); }
-    }
-    @keyframes drift2 {
-      0%, 100% { transform: translate(0,0); }
-      50%       { transform: translate(-30px, -20px); }
-    }
+    /* LAYOUT */
+    .page-body { display: flex; flex: 1; }
 
-    /* Card */
-    .card {
-      position: relative; z-index: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 52px 44px 44px;
-      width: 100%; max-width: 420px;
-      text-align: center;
-      animation: slideUp .5s cubic-bezier(.22,.68,0,1.2) both;
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(28px) scale(.97); }
-      to   { opacity: 1; transform: translateY(0)   scale(1);    }
-    }
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); flex-shrink: 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; border-right: 1px solid var(--border); padding: 24px 0; }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .toc-label { font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent2); padding: 0 20px 10px; display: block; }
+    .toc-link { display: block; padding: 7px 20px; font-size: 12px; color: var(--muted); text-decoration: none; transition: all .15s; border-left: 2px solid transparent; line-height: 1.4; }
+    .toc-link:hover { color: var(--txt); background: var(--surface); }
+    .toc-link.active { color: var(--accent); border-left-color: var(--accent); background: rgba(0,229,255,.05); }
+    .toc-link.sub { padding-left: 32px; font-size: 11px; }
+    .toc-sep { height: 1px; background: var(--border); margin: 10px 20px; }
 
-    /* Top accent bar */
-    .card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent2), var(--accent));
-      border-radius: 16px 16px 0 0;
-    }
+    /* CONTENT */
+    .content { flex: 1; min-width: 0; padding: 48px clamp(24px, 4vw, 60px); max-width: 860px; }
 
-    /* Tag */
-    .tag {
-      display: inline-flex; align-items: center; gap: 7px;
-      font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
-      text-transform: uppercase; color: var(--accent);
-      background: rgba(0,229,255,.07);
-      border: 1px solid rgba(0,229,255,.15);
-      border-radius: 20px; padding: 5px 14px;
-      margin-bottom: 28px;
-    }
-    .tag .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 6px var(--success);
-      animation: pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: .4; }
-    }
+    /* SECTIONS */
+    .doc-section { margin-bottom: 60px; scroll-margin-top: 76px; }
+    .doc-section h2 { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--txt); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .doc-section h2 .slug { color: var(--accent); }
+    .doc-section h3 { font-family: var(--mono); font-size: 14px; color: var(--accent2); letter-spacing: .04em; text-transform: uppercase; margin: 28px 0 12px; }
+    p, li { font-size: 14px; line-height: 1.8; color: #cbd5e1; }
+    p { margin-bottom: 12px; }
+    ul, ol { padding-left: 20px; margin-bottom: 12px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--txt); font-weight: 600; }
+    code { font-family: var(--mono); font-size: 12px; background: var(--surface2); color: var(--accent); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); }
 
-    h1 {
-      font-family: var(--mono);
-      font-size: 26px; font-weight: 700;
-      letter-spacing: .02em; line-height: 1.2;
-      margin-bottom: 12px;
-    }
-    h1 span { color: var(--accent); }
+    /* CODE BLOCKS */
+    .code-block { position: relative; margin: 16px 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .code-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .code-lang { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .copy-btn { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--border); padding: 3px 10px; border-radius: 4px; cursor: pointer; transition: all .15s; }
+    .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+    .copy-btn.copied { color: var(--success); border-color: var(--success); }
+    pre { padding: 18px; overflow-x: auto; font-family: var(--mono); font-size: 12px; line-height: 1.75; color: #94a3b8; }
+    pre::-webkit-scrollbar { height: 4px; }
+    pre::-webkit-scrollbar-thumb { background: var(--border); }
+    .t-kw  { color: #c084fc; }
+    .t-str { color: #86efac; }
+    .t-key { color: #7dd3fc; }
+    .t-cm  { color: #475569; font-style: italic; }
+    .t-url { color: #fde68a; }
+    .t-acc { color: #00e5ff; }
+    .t-flag{ color: #f472b6; }
+    .t-num { color: #fb923c; }
 
-    .subtitle {
-      font-size: 14px; color: var(--muted);
-      line-height: 1.6; margin-bottom: 36px;
-    }
+    /* TABLES */
+    .doc-table-wrap { overflow-x: auto; margin: 16px 0; border-radius: 10px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: var(--surface2); padding: 10px 14px; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border); }
+    tbody td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.6; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: rgba(255,255,255,.02); }
+    .req { color: var(--success); font-family: var(--mono); }
 
-    /* Stats row */
-    .stats {
-      display: flex; justify-content: center; gap: 0;
-      border: 1px solid var(--border); border-radius: 10px;
-      overflow: hidden; margin-bottom: 32px;
-    }
-    .stat {
-      flex: 1; padding: 14px 10px;
-      border-right: 1px solid var(--border);
-    }
-    .stat:last-child { border-right: none; }
-    .stat .val {
-      font-family: var(--mono); font-size: 18px; font-weight: 700;
-      color: var(--accent); display: block;
-    }
-    .stat .lbl {
-      font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
-      color: var(--muted); margin-top: 3px; display: block;
-    }
+    /* CALLOUTS */
+    .callout { display: flex; gap: 12px; padding: 14px 16px; border-radius: 8px; margin: 16px 0; font-size: 13px; line-height: 1.65; }
+    .callout-info { background: rgba(0,229,255,.06); border-left: 3px solid var(--accent); }
+    .callout-warn { background: rgba(245,158,11,.06); border-left: 3px solid var(--warn); }
+    .callout-tip  { background: rgba(0,200,150,.06); border-left: 3px solid var(--success); }
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
 
-    /* CTA button */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      width: 100%; padding: 15px 24px;
-      background: var(--accent); color: #000;
-      font-family: var(--mono); font-size: 13px; font-weight: 700;
-      letter-spacing: .06em; text-transform: uppercase;
-      text-decoration: none; border-radius: 10px;
-      transition: all .25s; border: none; cursor: pointer;
-      box-shadow: 0 0 24px rgba(0,229,255,.2);
-    }
-    .btn:hover {
-      filter: brightness(1.1);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0,229,255,.35);
-    }
-    .btn:active { transform: translateY(0); }
-    .btn .arrow {
-      transition: transform .25s;
-    }
-    .btn:hover .arrow { transform: translateX(4px); }
+    /* PIPELINE */
+    .pipeline { display: flex; flex-direction: column; margin: 20px 0; padding: 20px 22px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; font-family: var(--mono); font-size: 12px; gap: 0; }
+    .pipe-step { display: flex; align-items: center; gap: 14px; padding: 10px 0; }
+    .pipe-step + .pipe-step { border-top: 1px dashed var(--border); }
+    .pipe-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .p-blue   { background: rgba(0,229,255,.1); }
+    .p-purple { background: rgba(124,58,237,.15); }
+    .p-green  { background: rgba(0,200,150,.1); }
+    .p-warn   { background: rgba(245,158,11,.1); }
+    .pipe-txt .title { color: var(--txt); font-size: 12px; }
+    .pipe-txt .sub   { color: var(--muted); font-size: 11px; margin-top: 2px; }
 
-    /* Footer */
-    .footer {
-      margin-top: 28px;
-      display: flex; align-items: center; justify-content: center; gap: 16px;
-    }
-    .footer span {
-      font-size: 11px; color: var(--muted);
-      font-family: var(--mono); letter-spacing: .06em;
-      display: flex; align-items: center; gap: 5px;
-    }
-    .footer span::before {
-      content: '//';
-      color: var(--border);
-    }
+    /* FEAT GRID */
+    .feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; margin: 20px 0; }
+    .feat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .feat-card .icon { font-size: 20px; margin-bottom: 8px; }
+    .feat-card .name { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-bottom: 4px; }
+    .feat-card .desc { font-size: 12px; color: var(--muted); line-height: 1.55; }
 
-    @media (max-width: 480px) {
-      .card { padding: 40px 24px 32px; }
-      h1 { font-size: 21px; }
-      .stats .val { font-size: 15px; }
-    }
+    /* METHOD BADGES */
+    .badge { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; letter-spacing: .06em; }
+    .b-get    { background: #0e3a2a; color: #00c896; }
+    .b-post   { background: #1a2a4a; color: #00e5ff; }
+    .b-put    { background: #3a2a0e; color: #f59e0b; }
+    .b-patch  { background: #2a1a3a; color: #c084fc; }
+    .b-delete { background: #3a0e1a; color: #ff4560; }
+
+    /* CURL EXAMPLES */
+    .curl-example { margin-bottom: 40px; }
+    .example-title { font-family: var(--mono); font-size: 13px; color: var(--txt); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .example-desc { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+
+    /* QUICK REF */
+    .qref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .qref-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .qref-card h4 { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent2); margin-bottom: 10px; }
+    .qref-row { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; margin-bottom: 6px; font-family: var(--mono); }
+    .qref-row .k { color: var(--accent); flex-shrink: 0; min-width: 130px; }
+    .qref-row .v { color: var(--muted); }
+
+    @media (max-width: 900px) { .sidebar { display: none; } .qref-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .hero { padding: 48px 20px 40px; } .content { padding: 32px 20px; } }
   </style>
 </head>
 <body>
 
-<div class="glow-1"></div>
-<div class="glow-2"></div>
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand"><span class="nav-dot"></span>// API WRAPPER ADMIN</div>
+  <div class="nav-links">
+    <a href="#docs" class="nav-btn nb-ghost">Docs</a>
+    <a href="/configs/ui" class="nav-btn nb-accent">Open Admin →</a>
+  </div>
+</nav>
 
-<div class="card">
-  <div class="tag">
-    <span class="dot"></span>
+<!-- HERO -->
+<div class="hero">
+  <div class="hg hg1"></div><div class="hg hg2"></div>
+  <div class="hero-tag">
+    <span style="width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success);animation:pulse 2s ease-in-out infinite;display:inline-block"></span>
     System Online
   </div>
-
-  <h1>API<br/><span>Wrapper</span> Admin</h1>
-  <p class="subtitle">Manage, transform, and proxy your API integrations from a single control panel.</p>
-
-  <div class="stats">
-    <div class="stat">
-      <span class="val">∞</span>
-      <span class="lbl">Configs</span>
-    </div>
-    <div class="stat">
-      <span class="val">6</span>
-      <span class="lbl">Transform types</span>
-    </div>
-    <div class="stat">
-      <span class="val">0ms</span>
-      <span class="lbl">Overhead</span>
-    </div>
+  <h1>API <span class="c">Wrapper</span><br/>Admin</h1>
+  <p>A lightweight Flask proxy and transformation engine. Store upstream API configs, reshape every layer of the request and response, and execute them with a single POST.</p>
+  <div class="hero-actions">
+    <a href="/configs/ui" class="nav-btn nb-accent" style="padding:12px 24px;font-size:13px">Open Config Portal →</a>
+    <a href="#overview"   class="nav-btn nb-ghost"  style="padding:12px 24px;font-size:13px">Read the Docs</a>
   </div>
-
-  <a href="/configs/ui" class="btn">
-    Open Config Portal
-    <span class="arrow">→</span>
-  </a>
-
-  <div class="footer">
-    <span>Secure</span>
-    <span>Fast</span>
-    <span>Centralized</span>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="v">6</span><span class="l">Transform Types</span></div>
+    <div class="hero-stat"><span class="v">4</span><span class="l">Auth Methods</span></div>
+    <div class="hero-stat"><span class="v">3</span><span class="l">Execute Modes</span></div>
+    <div class="hero-stat"><span class="v">&#8734;</span><span class="l">Configs</span></div>
   </div>
 </div>
 
+<!-- PAGE BODY -->
+<div class="page-body" id="docs">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <span class="toc-label">Documentation</span>
+    <a class="toc-link" href="#overview">Overview</a>
+    <a class="toc-link" href="#project-structure">Project Structure</a>
+    <a class="toc-link" href="#installation">Installation</a>
+    <a class="toc-link" href="#migration">Database Migration</a>
+    <div class="toc-sep"></div>
+    <span class="toc-label">Configuration</span>
+    <a class="toc-link" href="#fields">Config Fields</a>
+    <a class="toc-link" href="#transforms">Transformation System</a>
+    <a class="toc-link sub" href="#source-expressions">&#x21b3; Source Expressions</a>
+    <a class="toc-link sub" href="#path-params">&#x21b3; Path Parameters</a>
+    <a class="toc-link sub" href="#query-params">&#x21b3; Query Parameters</a>
+    <a class="toc-link sub" href="#body-transform">&#x21b3; Body Transform</a>
+    <a class="toc-link sub" href="#response-transform">&#x21b3; Response Transform</a>
+    <a class="toc-link sub" href="#header-transform">&#x21b3; Header Transform</a>
+    <a class="toc-link sub" href="#static-headers">&#x21b3; Static Headers</a>
+    <a class="toc-link" href="#auth">Auth Types</a>
+    <a class="toc-link" href="#sample-payload">Sample Payload</a>
+    <div class="toc-sep"></div>
+    <span class="toc-label">API Reference</span>
+    <a class="toc-link" href="#api-configs">Config Endpoints</a>
+    <a class="toc-link" href="#api-execute">Execute Endpoints</a>
+    <div class="toc-sep"></div>
+    <span class="toc-label">Examples</span>
+    <a class="toc-link" href="#ex1">1. Simple GET</a>
+    <a class="toc-link" href="#ex2">2. Path + Query Params</a>
+    <a class="toc-link" href="#ex3">3. Bearer + Body Transform</a>
+    <a class="toc-link" href="#ex4">4. Basic Auth</a>
+    <a class="toc-link" href="#ex5">5. API Key Header</a>
+    <a class="toc-link" href="#ex6">6. Header Transform</a>
+    <a class="toc-link" href="#ex7">7. DELETE Path Param</a>
+    <a class="toc-link" href="#ex8">8. Full Kitchen Sink</a>
+    <div class="toc-sep"></div>
+    <a class="toc-link" href="#admin-ui">Admin UI</a>
+    <a class="toc-link" href="#quick-ref">Quick Reference</a>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- OVERVIEW -->
+    <section class="doc-section" id="overview">
+      <h2><span class="slug">#</span> Overview</h2>
+      <p>API Wrapper Admin lets you store upstream API configurations in a SQLite database and execute them by posting a payload. Every aspect of the request — URL, headers, query string, body, and response — can be transformed dynamically using dot-path or JMESPath expressions resolved against the incoming payload.</p>
+      <div class="pipeline">
+        <div class="pipe-step"><div class="pipe-icon p-blue">&#x1F4E5;</div><div class="pipe-txt"><div class="title">Your App sends POST /execute/:id { payload }</div><div class="sub">The call payload is the source of truth for all transforms</div></div></div>
+        <div class="pipe-step"><div class="pipe-icon p-purple">&#x2699;&#xFE0F;</div><div class="pipe-txt"><div class="title">Resolve all transforms against payload</div><div class="sub">Path params &rarr; URL &nbsp;&middot;&nbsp; Query params &rarr; ?string &nbsp;&middot;&nbsp; Body &rarr; request body &nbsp;&middot;&nbsp; Headers &rarr; headers</div></div></div>
+        <div class="pipe-step"><div class="pipe-icon p-warn">&#x1F310;</div><div class="pipe-txt"><div class="title">Call upstream API</div><div class="sub">Fully resolved URL, headers, auth, and body are sent</div></div></div>
+        <div class="pipe-step"><div class="pipe-icon p-green">&#x1F504;</div><div class="pipe-txt"><div class="title">Apply response transform</div><div class="sub">Map upstream response fields to your shaped output</div></div></div>
+        <div class="pipe-step"><div class="pipe-icon p-blue">&#x1F4E4;</div><div class="pipe-txt"><div class="title">Return shaped response to your app</div><div class="sub">Only the fields you defined in response_transform are returned</div></div></div>
+      </div>
+    </section>
+
+    <!-- PROJECT STRUCTURE -->
+    <section class="doc-section" id="project-structure">
+      <h2><span class="slug">#</span> Project Structure</h2>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">directory tree</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>app/
+&#x251C;&#x2500;&#x2500; <span class="t-acc">__init__.py</span>          <span class="t-cm"># App factory (create_app)</span>
+&#x251C;&#x2500;&#x2500; <span class="t-acc">config.py</span>            <span class="t-cm"># SQLAlchemy config, DB path</span>
+&#x251C;&#x2500;&#x2500; <span class="t-acc">database.py</span>          <span class="t-cm"># db = SQLAlchemy()</span>
+&#x251C;&#x2500;&#x2500; <span class="t-acc">models.py</span>            <span class="t-cm"># APIConfig model</span>
+&#x251C;&#x2500;&#x2500; <span class="t-acc">crud.py</span>              <span class="t-cm"># DB operations</span>
+&#x251C;&#x2500;&#x2500; <span class="t-acc">executor.py</span>          <span class="t-cm"># HTTP execution + all transformations</span>
+&#x251C;&#x2500;&#x2500; <span class="t-acc">utils.py</span>             <span class="t-cm"># serialize_model / serialize_list</span>
+&#x2514;&#x2500;&#x2500; routes/
+    &#x251C;&#x2500;&#x2500; <span class="t-acc">config_routes.py</span> <span class="t-cm"># CRUD endpoints for configs</span>
+    &#x2514;&#x2500;&#x2500; <span class="t-acc">execute_routes.py</span><span class="t-cm"># Execute, sample, dry-run endpoints</span>
+templates/
+&#x251C;&#x2500;&#x2500; <span class="t-acc">index.html</span>           <span class="t-cm"># Landing page + docs</span>
+&#x2514;&#x2500;&#x2500; <span class="t-acc">configs.html</span>         <span class="t-cm"># Admin UI</span>
+<span class="t-acc">run.py</span>                   <span class="t-cm"># Entry point</span>
+<span class="t-acc">migrate.py</span>               <span class="t-cm"># DB migration for new columns</span>
+<span class="t-acc">configs.db</span>               <span class="t-cm"># SQLite database (auto-created)</span></pre>
+      </div>
+    </section>
+
+    <!-- INSTALLATION -->
+    <section class="doc-section" id="installation">
+      <h2><span class="slug">#</span> Installation</h2>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="t-cm"># Create a virtual environment</span>
+<span class="t-kw">python</span> -m venv venv
+<span class="t-kw">source</span> venv/bin/activate      <span class="t-cm"># Windows: venv\Scripts\activate</span>
+
+<span class="t-cm"># Install dependencies</span>
+<span class="t-kw">pip</span> install flask flask-sqlalchemy httpx
+
+<span class="t-cm"># Optional: JMESPath for advanced path queries (items[0].id syntax)</span>
+<span class="t-kw">pip</span> install jmespath</pre>
+      </div>
+      <h3>Running the App</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="t-kw">python</span> run.py</pre>
+      </div>
+      <p>Server starts at <code>http://localhost:5000</code>. Landing page at <code>/</code>, Admin UI at <code>/configs/ui</code>.</p>
+    </section>
+
+    <!-- MIGRATION -->
+    <section class="doc-section" id="migration">
+      <h2><span class="slug">#</span> Database Migration</h2>
+      <p>If upgrading an existing <code>configs.db</code> created before the transformation columns were added, run the migration script <strong>once</strong>:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="t-kw">python</span> migrate.py</pre>
+      </div>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#x2139;&#xFE0F;</span>
+        <span>For fresh installs, the database and all columns are created automatically on first startup via <code>db.create_all()</code>. No migration needed.</span>
+      </div>
+    </section>
+
+    <!-- FIELDS -->
+    <section class="doc-section" id="fields">
+      <h2><span class="slug">#</span> Config Fields Reference</h2>
+      <div class="doc-table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Req</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>name</code></td><td>string</td><td><span class="req">&#x2705;</span></td><td>Unique identifier for this config</td></tr>
+            <tr><td><code>url</code></td><td>string</td><td><span class="req">&#x2705;</span></td><td>URL template, supports <code>{param}</code> placeholders</td></tr>
+            <tr><td><code>method</code></td><td>string</td><td><span class="req">&#x2705;</span></td><td><code>GET</code> <code>POST</code> <code>PUT</code> <code>PATCH</code> <code>DELETE</code></td></tr>
+            <tr><td><code>enabled</code></td><td>boolean</td><td></td><td>Whether this config can be executed. Default <code>true</code></td></tr>
+            <tr><td><code>auth_type</code></td><td>string</td><td></td><td><code>bearer</code>, <code>basic</code>, <code>api_key</code>, or omit for none</td></tr>
+            <tr><td><code>auth_value</code></td><td>string</td><td></td><td>Token, <code>user:pass</code>, or API key depending on auth type</td></tr>
+            <tr><td><code>auth_header_name</code></td><td>string</td><td></td><td>Header name for <code>api_key</code> auth. Default <code>X-API-Key</code></td></tr>
+            <tr><td><code>headers</code></td><td>JSON object</td><td></td><td>Static headers always sent with the request</td></tr>
+            <tr><td><code>header_transform</code></td><td>JSON object</td><td></td><td>Dynamic headers resolved from call payload at runtime</td></tr>
+            <tr><td><code>path_params_schema</code></td><td>JSON array</td><td></td><td>Bindings for <code>{placeholder}</code> segments in the URL</td></tr>
+            <tr><td><code>query_params_schema</code></td><td>JSON array</td><td></td><td>Static and dynamic query string parameters</td></tr>
+            <tr><td><code>body_transform</code></td><td>JSON object</td><td></td><td>Maps call payload &rarr; outgoing request body</td></tr>
+            <tr><td><code>response_transform</code></td><td>JSON object</td><td></td><td>Maps upstream response &rarr; returned response</td></tr>
+            <tr><td><code>sample_payload</code></td><td>JSON object</td><td></td><td>Stored example payload for sample runs and dry runs</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TRANSFORMS -->
+    <section class="doc-section" id="transforms">
+      <h2><span class="slug">#</span> Transformation System</h2>
+      <p>All transformations use <strong>source expressions</strong> resolved against the incoming call payload.</p>
+
+      <h3 id="source-expressions">Source Expressions</h3>
+      <div class="doc-table-wrap">
+        <table>
+          <thead><tr><th>Expression</th><th>Behaviour</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td><code>field</code></td><td>Top-level key lookup</td><td><code>"user_id"</code> &rarr; <code>payload["user_id"]</code></td></tr>
+            <tr><td><code>parent.child</code></td><td>Dot-path traversal</td><td><code>"user.email"</code> &rarr; <code>payload["user"]["email"]</code></td></tr>
+            <tr><td><code>items[0].id</code></td><td>JMESPath (requires jmespath)</td><td>First item's id from an array</td></tr>
+            <tr><td><code>$LITERAL:value</code></td><td>Hardcoded constant string</td><td><code>"$LITERAL:viewer"</code> &rarr; <code>"viewer"</code></td></tr>
+            <tr><td><code>$PASSTHROUGH</code></td><td>Skip transform, use as-is</td><td>See body / response transform</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-tip">
+        <span class="callout-icon">&#x1F4A1;</span>
+        <span>If <code>jmespath</code> is not installed, the system falls back to simple dot-path splitting. Install with <code>pip install jmespath</code> to unlock array and filter expressions.</span>
+      </div>
+
+      <h3 id="path-params">Path Parameters</h3>
+      <p>Inject dynamic values into URL placeholders using <code>{param_name}</code> syntax.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">url template</span></div>
+        <pre><span class="t-url">https://api.example.com/orgs/{org_id}/users/{user_id}</span></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">path_params_schema</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>[
+  { <span class="t-key">"name"</span>: <span class="t-str">"org_id"</span>,  <span class="t-key">"source"</span>: <span class="t-str">"org.id"</span>  },
+  { <span class="t-key">"name"</span>: <span class="t-str">"user_id"</span>, <span class="t-key">"source"</span>: <span class="t-str">"user.id"</span> }
+]</pre>
+      </div>
+      <p>Payload <code>{ "org": { "id": "org_42" }, "user": { "id": "usr_7" } }</code> resolves to <code>https://api.example.com/orgs/org_42/users/usr_7</code></p>
+
+      <h3 id="query-params">Query Parameters</h3>
+      <p>Use <code>value</code> for static params and <code>source</code> for dynamic params resolved from the payload.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">query_params_schema</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>[
+  { <span class="t-key">"name"</span>: <span class="t-str">"limit"</span>,  <span class="t-key">"value"</span>:  <span class="t-str">"10"</span>             },  <span class="t-cm">// static</span>
+  { <span class="t-key">"name"</span>: <span class="t-str">"status"</span>, <span class="t-key">"source"</span>: <span class="t-str">"filter.status"</span> },  <span class="t-cm">// dynamic</span>
+  { <span class="t-key">"name"</span>: <span class="t-str">"page"</span>,   <span class="t-key">"source"</span>: <span class="t-str">"page"</span>          }
+]</pre>
+      </div>
+
+      <h3 id="body-transform">Body Transform</h3>
+      <p>Maps call payload fields to the outgoing upstream request body.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">body_transform</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>{
+  <span class="t-key">"username"</span>:    <span class="t-str">"user.name"</span>,
+  <span class="t-key">"email"</span>:       <span class="t-str">"user.email"</span>,
+  <span class="t-key">"role"</span>:        <span class="t-str">"$LITERAL:viewer"</span>,
+  <span class="t-key">"external_id"</span>: <span class="t-str">"meta.id"</span>
+}</pre>
+      </div>
+      <p>To forward the payload unchanged: <code>{ "$PASSTHROUGH": true }</code></p>
+      <div class="callout callout-warn">
+        <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+        <span>For <code>GET</code>, <code>HEAD</code>, and <code>DELETE</code> methods, the body is never sent regardless of this setting.</span>
+      </div>
+
+      <h3 id="response-transform">Response Transform</h3>
+      <p>Maps upstream API response fields to your returned response. Source expressions are resolved against the upstream JSON body.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">response_transform</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>{
+  <span class="t-key">"userId"</span>:   <span class="t-str">"data.id"</span>,
+  <span class="t-key">"fullName"</span>: <span class="t-str">"data.attributes.name"</span>,
+  <span class="t-key">"email"</span>:    <span class="t-str">"data.attributes.email"</span>
+}</pre>
+      </div>
+      <p>Omitting <code>response_transform</code> or using <code>{"$PASSTHROUGH": true}</code> returns the raw upstream response.</p>
+
+      <h3 id="header-transform">Header Transform</h3>
+      <p>Dynamically inject request headers from the call payload at runtime. Ideal for multi-tenant systems.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">header_transform</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>{
+  <span class="t-key">"X-Tenant-Id"</span>:  <span class="t-str">"tenant_id"</span>,
+  <span class="t-key">"X-User-Email"</span>: <span class="t-str">"user.email"</span>,
+  <span class="t-key">"X-Request-Id"</span>: <span class="t-str">"meta.request_id"</span>
+}</pre>
+      </div>
+
+      <h3 id="static-headers">Static Headers</h3>
+      <p>Always-sent headers, regardless of call payload.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">headers</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>{
+  <span class="t-key">"Content-Type"</span>:  <span class="t-str">"application/json"</span>,
+  <span class="t-key">"X-App-Version"</span>: <span class="t-str">"3.0"</span>
+}</pre>
+      </div>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#x2139;&#xFE0F;</span>
+        <span><strong>Header merge order (highest priority wins):</strong> Static headers &rarr; Auth header &rarr; Header transform</span>
+      </div>
+    </section>
+
+    <!-- AUTH -->
+    <section class="doc-section" id="auth">
+      <h2><span class="slug">#</span> Auth Types</h2>
+      <div class="doc-table-wrap">
+        <table>
+          <thead><tr><th>auth_type</th><th>Behaviour</th><th>auth_value format</th></tr></thead>
+          <tbody>
+            <tr><td><em>(omitted)</em></td><td>No auth header added</td><td>&#x2014;</td></tr>
+            <tr><td><code>bearer</code></td><td>Adds <code>Authorization: Bearer &lt;value&gt;</code></td><td>Raw token string</td></tr>
+            <tr><td><code>basic</code></td><td>Adds <code>Authorization: Basic &lt;base64&gt;</code></td><td><code>username:password</code> — encoded automatically</td></tr>
+            <tr><td><code>api_key</code></td><td>Adds <code>&lt;auth_header_name&gt;: &lt;value&gt;</code></td><td>Raw API key string</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>For <code>api_key</code>, set <code>auth_header_name</code> to override the default <code>X-API-Key</code>.</p>
+    </section>
+
+    <!-- SAMPLE PAYLOAD -->
+    <section class="doc-section" id="sample-payload">
+      <h2><span class="slug">#</span> Sample Payload</h2>
+      <p><code>sample_payload</code> is a stored JSON object used as the default for <code>/sample</code> and <code>/dry-run</code> endpoints. Override individual fields by including them in the request body — they are merged on top (request body wins).</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="t-cm"># Run with stored sample as-is</span>
+<span class="t-kw">curl</span> <span class="t-flag">-X POST</span> http://localhost:5000/execute/1/sample <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> <span class="t-flag">-d</span> <span class="t-str">'{}'</span>
+
+<span class="t-cm"># Override one field</span>
+<span class="t-kw">curl</span> <span class="t-flag">-X POST</span> http://localhost:5000/execute/1/sample <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> <span class="t-flag">-d</span> <span class="t-str">'{"user_id": 99}'</span></pre>
+      </div>
+    </section>
+
+    <!-- API CONFIG ENDPOINTS -->
+    <section class="doc-section" id="api-configs">
+      <h2><span class="slug">#</span> Config Endpoints</h2>
+      <div class="doc-table-wrap">
+        <table>
+          <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge b-get">GET</span></td><td><code>/configs</code></td><td>List all configs</td></tr>
+            <tr><td><span class="badge b-post">POST</span></td><td><code>/configs</code></td><td>Create a new config</td></tr>
+            <tr><td><span class="badge b-put">PUT</span></td><td><code>/configs/:id</code></td><td>Update an existing config</td></tr>
+            <tr><td><span class="badge b-delete">DELETE</span></td><td><code>/configs/:id</code></td><td>Delete a config</td></tr>
+            <tr><td><span class="badge b-patch">PATCH</span></td><td><code>/configs/:id/toggle</code></td><td>Toggle enabled on/off</td></tr>
+            <tr><td><span class="badge b-post">POST</span></td><td><code>/configs/:id/clone</code></td><td>Clone config (disabled by default)</td></tr>
+            <tr><td><span class="badge b-get">GET</span></td><td><code>/configs/ui</code></td><td>Admin UI (HTML)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- API EXECUTE ENDPOINTS -->
+    <section class="doc-section" id="api-execute">
+      <h2><span class="slug">#</span> Execute Endpoints</h2>
+      <div class="doc-table-wrap">
+        <table>
+          <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge b-post">POST</span></td><td><code>/execute/:id</code></td><td>Execute config with provided payload</td></tr>
+            <tr><td><span class="badge b-post">POST</span></td><td><code>/execute/:id/sample</code></td><td>Execute using stored sample_payload (merged with body)</td></tr>
+            <tr><td><span class="badge b-post">POST</span></td><td><code>/execute/:id/dry-run</code></td><td>Return resolved request &mdash; no HTTP call made</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Dry-run Response Shape</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>{
+  <span class="t-key">"method"</span>:       <span class="t-str">"POST"</span>,
+  <span class="t-key">"url"</span>:          <span class="t-url">"https://api.example.com/orgs/org_42/users/usr_7"</span>,
+  <span class="t-key">"headers"</span>: {
+    <span class="t-key">"Content-Type"</span>:  <span class="t-str">"application/json"</span>,
+    <span class="t-key">"Authorization"</span>: <span class="t-str">"Bearer tok_xyz"</span>,
+    <span class="t-key">"X-Tenant-Id"</span>:  <span class="t-str">"acme-corp"</span>
+  },
+  <span class="t-key">"query_params"</span>: { <span class="t-key">"limit"</span>: <span class="t-str">"10"</span>, <span class="t-key">"status"</span>: <span class="t-str">"active"</span> },
+  <span class="t-key">"body"</span>: {
+    <span class="t-key">"username"</span>: <span class="t-str">"Ada Lovelace"</span>,
+    <span class="t-key">"email"</span>:    <span class="t-str">"ada@acme.com"</span>,
+    <span class="t-key">"role"</span>:     <span class="t-str">"viewer"</span>
+  }
+}</pre>
+      </div>
+    </section>
+
+    <!-- CURL EXAMPLES header -->
+    <section class="doc-section" id="curl-examples">
+      <h2><span class="slug">#</span> cURL Examples</h2>
+      <p>All examples target <code>http://localhost:5000</code>. Replace IDs in execute calls with the <code>id</code> returned from create.</p>
+    </section>
+
+    <section class="doc-section" id="ex1">
+      <div class="curl-example">
+        <div class="example-title"><span class="badge b-get">GET</span> 1. Simple GET &mdash; No Auth</div>
+        <div class="example-desc">Plain passthrough with no transforms.</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/configs \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> \
+  <span class="t-flag">-d</span> <span class="t-str">'{"name": "get_public_ip", "url": "https://httpbin.org/get", "method": "GET", "enabled": true}'</span>
+
+<span class="t-cm"># Execute</span>
+<span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/execute/1 \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> <span class="t-flag">-d</span> <span class="t-str">'{}'</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" id="ex2">
+      <div class="curl-example">
+        <div class="example-title"><span class="badge b-get">GET</span> 2. Path Param + Query Params</div>
+        <div class="example-desc">URL uses <code>{user_id}</code> placeholder; appends static and dynamic query params.</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/configs \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> \
+  <span class="t-flag">-d</span> <span class="t-str">'{
+    "name": "get_user_posts",
+    "url": "https://jsonplaceholder.typicode.com/users/{user_id}/posts",
+    "method": "GET",
+    "path_params_schema":  "[{\"name\": \"user_id\", \"source\": \"user_id\"}]",
+    "query_params_schema": "[{\"name\": \"_limit\", \"value\": \"5\"}, {\"name\": \"_page\", \"source\": \"page\"}]",
+    "sample_payload": "{\"user_id\": 1, \"page\": 2}",
+    "enabled": true
+  }'</span>
+
+<span class="t-cm"># Dry run</span>
+<span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/execute/2/dry-run \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> <span class="t-flag">-d</span> <span class="t-str">'{"user_id": 3, "page": 1}'</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" id="ex3">
+      <div class="curl-example">
+        <div class="example-title"><span class="badge b-post">POST</span> 3. Bearer Token + Body Transform</div>
+        <div class="example-desc">Reshapes the call payload into the upstream request body and maps the response.</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/configs \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> \
+  <span class="t-flag">-d</span> <span class="t-str">'{
+    "name": "create_user_bearer",
+    "url": "https://httpbin.org/post",
+    "method": "POST",
+    "auth_type": "bearer",
+    "auth_value": "my-secret-token-abc123",
+    "body_transform": "{\"username\": \"user.name\", \"email\": \"user.email\", \"role\": \"$LITERAL:viewer\"}",
+    "response_transform": "{\"sentBody\": \"json\", \"requestUrl\": \"url\"}",
+    "sample_payload": "{\"user\": {\"name\": \"Jane Doe\", \"email\": \"jane@acme.com\"}}",
+    "enabled": true
+  }'</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" id="ex4">
+      <div class="curl-example">
+        <div class="example-title"><span class="badge b-post">POST</span> 4. Basic Auth</div>
+        <div class="example-desc"><code>auth_value</code> is <code>username:password</code> — base64-encoded automatically.</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/configs \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> \
+  <span class="t-flag">-d</span> <span class="t-str">'{
+    "name": "basic_auth_post",
+    "url": "https://httpbin.org/post",
+    "method": "POST",
+    "auth_type": "basic",
+    "auth_value": "admin:supersecret",
+    "body_transform": "{\"$PASSTHROUGH\": true}",
+    "sample_payload": "{\"action\": \"sync\", \"target\": \"db\"}",
+    "enabled": true
+  }'</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" id="ex5">
+      <div class="curl-example">
+        <div class="example-title"><span class="badge b-get">GET</span> 5. API Key Header</div>
+        <div class="example-desc">Custom header name — useful for OpenWeatherMap, Stripe, etc.</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/configs \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> \
+  <span class="t-flag">-d</span> <span class="t-str">'{
+    "name": "weather_api",
+    "url": "https://httpbin.org/get",
+    "method": "GET",
+    "auth_type": "api_key",
+    "auth_value": "abc123weatherkey",
+    "auth_header_name": "X-API-Key",
+    "query_params_schema": "[{\"name\": \"city\", \"source\": \"city\"}, {\"name\": \"units\", \"value\": \"metric\"}]",
+    "sample_payload": "{\"city\": \"London\"}",
+    "enabled": true
+  }'</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" id="ex6">
+      <div class="curl-example">
+        <div class="example-title"><span class="badge b-put">PUT</span> 6. Dynamic Header Transform</div>
+        <div class="example-desc">Injects <code>X-Tenant-Id</code> and <code>X-User-Email</code> from the call payload at runtime.</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/configs \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> \
+  <span class="t-flag">-d</span> <span class="t-str">'{
+    "name": "update_tenant_resource",
+    "url": "https://httpbin.org/put",
+    "method": "PUT",
+    "auth_type": "bearer",
+    "auth_value": "platform-level-token",
+    "headers": "{\"Content-Type\": \"application/json\", \"X-App-Version\": \"2.1\"}",
+    "header_transform": "{\"X-Tenant-Id\": \"tenant_id\", \"X-User-Email\": \"user.email\"}",
+    "body_transform": "{\"resourceId\": \"resource.id\", \"payload\": \"resource.data\"}",
+    "sample_payload": "{\"tenant_id\": \"acme-corp\", \"user\": {\"email\": \"ops@acme.com\"}, \"resource\": {\"id\": \"res_99\", \"data\": {\"status\": \"active\"}}}",
+    "enabled": true
+  }'</span>
+
+<span class="t-cm"># Dry run — verify headers are resolved correctly</span>
+<span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/execute/6/dry-run \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> <span class="t-flag">-d</span> <span class="t-str">'{}'</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" id="ex7">
+      <div class="curl-example">
+        <div class="example-title"><span class="badge b-delete">DELETE</span> 7. DELETE with Path Param</div>
+        <div class="example-desc">Delete a resource by resolving its ID from the call payload.</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/configs \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> \
+  <span class="t-flag">-d</span> <span class="t-str">'{
+    "name": "delete_post",
+    "url": "https://jsonplaceholder.typicode.com/posts/{post_id}",
+    "method": "DELETE",
+    "path_params_schema": "[{\"name\": \"post_id\", \"source\": \"post_id\"}]",
+    "sample_payload": "{\"post_id\": 101}",
+    "enabled": true
+  }'</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" id="ex8">
+      <div class="curl-example">
+        <div class="example-title"><span class="badge b-post">POST</span> 8. Full Kitchen Sink</div>
+        <div class="example-desc">Path params + query params + bearer auth + static headers + header transform + body transform + response transform + sample payload.</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash &mdash; create</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/configs \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> \
+  <span class="t-flag">-d</span> <span class="t-str">'{
+    "name": "full_kitchen_sink",
+    "url": "https://httpbin.org/anything/{org_id}/users/{user_id}",
+    "method": "POST",
+    "auth_type": "bearer",
+    "auth_value": "tok_live_xyz987",
+    "headers": "{\"Content-Type\": \"application/json\", \"X-SDK-Version\": \"3.0\"}",
+    "header_transform": "{\"X-Tenant\": \"org.slug\", \"X-Request-Id\": \"meta.request_id\"}",
+    "path_params_schema": "[{\"name\": \"org_id\", \"source\": \"org.id\"}, {\"name\": \"user_id\", \"source\": \"user.id\"}]",
+    "query_params_schema": "[{\"name\": \"expand\", \"value\": \"profile,roles\"}, {\"name\": \"locale\", \"source\": \"meta.locale\"}]",
+    "body_transform": "{\"email\": \"user.email\", \"displayName\": \"user.name\", \"orgRole\": \"user.role\", \"source\": \"$LITERAL:api-wrapper\"}",
+    "response_transform": "{\"echoedBody\": \"json\", \"requestUrl\": \"url\"}",
+    "sample_payload": "{\"org\": {\"id\": \"org_42\", \"slug\": \"acme\"}, \"user\": {\"id\": \"usr_7\", \"name\": \"Ada Lovelace\", \"email\": \"ada@acme.com\", \"role\": \"admin\"}, \"meta\": {\"locale\": \"en-US\", \"request_id\": \"req_abc123\"}}",
+    "enabled": true
+  }'</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash &mdash; test</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="t-cm"># Dry run</span>
+<span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/execute/8/dry-run \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> <span class="t-flag">-d</span> <span class="t-str">'{}'</span>
+
+<span class="t-cm"># Execute with stored sample</span>
+<span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/execute/8/sample \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> <span class="t-flag">-d</span> <span class="t-str">'{}'</span>
+
+<span class="t-cm"># Execute with live override</span>
+<span class="t-kw">curl</span> <span class="t-flag">-s -X POST</span> http://localhost:5000/execute/8/sample \
+  <span class="t-flag">-H</span> <span class="t-str">"Content-Type: application/json"</span> \
+  <span class="t-flag">-d</span> <span class="t-str">'{"user": {"id": "usr_99", "name": "Override User", "email": "new@acme.com", "role": "viewer"}}'</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN UI -->
+    <section class="doc-section" id="admin-ui">
+      <h2><span class="slug">#</span> Admin UI</h2>
+      <p>The web UI at <code>/configs/ui</code> provides a full interface for managing configs without writing any cURL.</p>
+      <div class="feat-grid">
+        <div class="feat-card"><div class="icon">&#x1F4CB;</div><div class="name">Table View</div><div class="desc">All configs with method badges and 6 feature indicator dots</div></div>
+        <div class="feat-card"><div class="icon">&#x1F5C2;&#xFE0F;</div><div class="name">5-Tab Modal</div><div class="desc">Basic &middot; Auth &middot; Params &middot; Transform &middot; Sample</div></div>
+        <div class="feat-card"><div class="icon">&#x25B6;&#xFE0F;</div><div class="name">Sample Run</div><div class="desc">Executes config using its stored sample_payload</div></div>
+        <div class="feat-card"><div class="icon">&#x1F50D;</div><div class="name">Dry Run</div><div class="desc">Shows the fully resolved request without any HTTP call</div></div>
+        <div class="feat-card"><div class="icon">&#x1F500;</div><div class="name">Toggle</div><div class="desc">Enable / disable a config without deleting it</div></div>
+        <div class="feat-card"><div class="icon">&#x1F4CB;</div><div class="name">Clone</div><div class="desc">Duplicate a config (disabled by default)</div></div>
+      </div>
+      <h3>Feature Dots Legend</h3>
+      <p>Each config row shows 6 dots. <strong style="color:var(--success)">Green</strong> = configured, grey = not configured.</p>
+      <div class="doc-table-wrap">
+        <table>
+          <thead><tr><th>Dot</th><th>Feature</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Path params schema</td></tr>
+            <tr><td>2</td><td>Query params schema</td></tr>
+            <tr><td>3</td><td>Body transform</td></tr>
+            <tr><td>4</td><td>Response transform</td></tr>
+            <tr><td>5</td><td>Header transform</td></tr>
+            <tr><td>6</td><td>Sample payload</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- QUICK REF -->
+    <section class="doc-section" id="quick-ref">
+      <h2><span class="slug">#</span> Quick Reference</h2>
+      <div class="qref-grid">
+        <div class="qref-card">
+          <h4>Source expressions</h4>
+          <div class="qref-row"><span class="k">user_id</span><span class="v">&rarr; payload["user_id"]</span></div>
+          <div class="qref-row"><span class="k">user.email</span><span class="v">&rarr; payload["user"]["email"]</span></div>
+          <div class="qref-row"><span class="k">items[0].id</span><span class="v">&rarr; JMESPath array</span></div>
+          <div class="qref-row"><span class="k">$LITERAL:admin</span><span class="v">&rarr; "admin" hardcoded</span></div>
+          <div class="qref-row"><span class="k">$PASSTHROUGH</span><span class="v">&rarr; skip transform</span></div>
+        </div>
+        <div class="qref-card">
+          <h4>Auth types</h4>
+          <div class="qref-row"><span class="k">bearer</span><span class="v">Authorization: Bearer &lt;token&gt;</span></div>
+          <div class="qref-row"><span class="k">basic</span><span class="v">Authorization: Basic base64(u:p)</span></div>
+          <div class="qref-row"><span class="k">api_key</span><span class="v">&lt;header_name&gt;: &lt;key&gt;</span></div>
+        </div>
+        <div class="qref-card">
+          <h4>Header merge order</h4>
+          <div class="qref-row"><span class="k">1. headers</span><span class="v">static, always sent</span></div>
+          <div class="qref-row"><span class="k">2. auth header</span><span class="v">from auth_type</span></div>
+          <div class="qref-row"><span class="k">3. header_transform</span><span class="v">dynamic, highest priority</span></div>
+        </div>
+        <div class="qref-card">
+          <h4>Execute modes</h4>
+          <div class="qref-row"><span class="k">/execute/:id</span><span class="v">real call, full payload</span></div>
+          <div class="qref-row"><span class="k">/execute/:id/sample</span><span class="v">real call, uses sample</span></div>
+          <div class="qref-row"><span class="k">/execute/:id/dry-run</span><span class="v">no HTTP, resolved req</span></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  // Active TOC on scroll
+  const sections = document.querySelectorAll('.doc-section[id]');
+  const tocLinks = document.querySelectorAll('.toc-link');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.toc-link[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-56px 0px -60% 0px', threshold: 0 });
+  sections.forEach(s => io.observe(s));
+</script>
 </body>
 </html>
