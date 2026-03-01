@@ -43,7 +43,7 @@ def clone(id):
     if not config:
         return {"error": "Config not found"}, 404
 
-    return serialize_model(config)
+    return jsonify({"updated": config.id})
 
 
 @config_bp.route("/<int:id>", methods=["DELETE"])

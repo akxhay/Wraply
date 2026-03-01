@@ -3,257 +3,704 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Wrapper Admin — Configs</title>
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <!-- Alpine & (optional) Bootstrap JS for modal kept) -->
-  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <title>API Wrapper Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
+    :root {
+      --bg:        #0d0f14;
+      --surface:   #13161e;
+      --surface2:  #1a1e2a;
+      --border:    #252a38;
+      --accent:    #00e5ff;
+      --accent2:   #7c3aed;
+      --danger:    #ff4560;
+      --success:   #00c896;
+      --warn:      #f59e0b;
+      --txt:       #e2e8f0;
+      --muted:     #64748b;
+      --mono:      'Space Mono', monospace;
+      --sans:      'DM Sans', sans-serif;
     }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--txt);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #4f46e5, #06b6d4);
-      color: #1f2937;
+      padding: 32px 24px;
     }
-    .shell {
-      width: 100%;
-      max-width: 1100px;
-      background: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-      padding: 28px;
-      animation: fadeIn .6s ease-in-out;
-    }
-    .shell-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-    }
-    .title {
-      font-size: 28px;
-      font-weight: 700;
-    }
-    .subtitle {
-      font-size: 14px;
-      color: #6b7280;
-    }
-    .btn-primary-gradient {
-      display: inline-block;
-      padding: 12px 20px;
-      background: linear-gradient(135deg, #4f46e5, #06b6d4);
-      color: #fff;
-      text-decoration: none;
-      font-weight: 600;
-      border: 0;
-      border-radius: 12px;
-      transition: all .3s ease;
-      box-shadow: 0 8px 20px rgba(79,70,229,0.3);
-    }
-    .btn-primary-gradient:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(79,70,229,0.4); }
-    .btn-primary-gradient:active { transform: translateY(-1px); }
 
-    .card-like {
-      background: #fff;
-      border-radius: 14px;
-      border: none;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-      padding: 16px;
+    /* ── Scanline overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.06) 2px, rgba(0,0,0,.06) 4px);
+      pointer-events: none;
+      z-index: 999;
     }
-    table thead th { color: #6b7280; font-weight: 600; }
 
-    /* Toggle switch (kept from original) */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 22px;
+    /* ── Layout ── */
+    .wrap { max-width: 1240px; margin: 0 auto; }
+
+    .top-bar {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 32px; gap: 16px; flex-wrap: wrap;
     }
+
+    .logo-area h1 {
+      font-family: var(--mono);
+      font-size: 22px; letter-spacing: .04em;
+      color: var(--accent);
+    }
+    .logo-area p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* ── Buttons ── */
+    .btn {
+      font-family: var(--mono);
+      font-size: 12px; font-weight: 700;
+      padding: 9px 18px; border: none; cursor: pointer;
+      border-radius: 6px; transition: all .2s; letter-spacing: .05em;
+      text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-accent    { background: var(--accent); color: #000; }
+    .btn-accent:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .btn-ghost     { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--txt); border-color: var(--muted); }
+    .btn-danger    { background: transparent; color: var(--danger); border: 1px solid #ff456040; }
+    .btn-danger:hover { background: #ff456015; }
+    .btn-success   { background: transparent; color: var(--success); border: 1px solid #00c89640; }
+    .btn-success:hover { background: #00c89615; }
+    .btn-warn      { background: transparent; color: var(--warn); border: 1px solid #f59e0b40; }
+    .btn-warn:hover { background: #f59e0b15; }
+    .btn-purple    { background: transparent; color: #a78bfa; border: 1px solid #7c3aed40; }
+    .btn-purple:hover { background: #7c3aed15; }
+    .btn-sm { padding: 6px 12px; font-size: 11px; }
+
+    /* ── Table card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 12px 16px;
+      font-family: var(--mono);
+      font-size: 11px; letter-spacing: .1em;
+      color: var(--muted); text-transform: uppercase;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      text-align: left; white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+    td {
+      padding: 13px 16px;
+      font-size: 13px; vertical-align: middle;
+    }
+
+    /* ── Badges ── */
+    .badge {
+      font-family: var(--mono);
+      font-size: 10px; font-weight: 700; letter-spacing: .08em;
+      padding: 3px 8px; border-radius: 4px; text-transform: uppercase;
+    }
+    .badge-GET    { background: #0e3a2a; color: var(--success); }
+    .badge-POST   { background: #1a2a4a; color: var(--accent); }
+    .badge-PUT    { background: #3a2a0e; color: var(--warn); }
+    .badge-DELETE { background: #3a0e1a; color: var(--danger); }
+    .badge-PATCH  { background: #2a1a3a; color: #c084fc; }
+
+    /* ── Feature dots ── */
+    .feat-dots { display: flex; gap: 4px; flex-wrap: wrap; }
+    .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      title: '';
+    }
+    .dot-active  { background: var(--success); box-shadow: 0 0 4px var(--success); }
+    .dot-inactive { background: var(--border); }
+
+    /* ── Toggle ── */
+    .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
-      position: absolute;
-      cursor: pointer;
-      inset: 0;
-      background-color: #ef4444;
-      transition: .3s;
-      border-radius: 34px;
+      position: absolute; cursor: pointer; inset: 0;
+      background: #2a0e0e; transition: .3s; border-radius: 34px;
+      border: 1px solid #3a1515;
     }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 3px;
-      bottom: 3px;
-      background: white;
-      transition: .3s;
-      border-radius: 50%;
+    .slider::before {
+      position: absolute; content: "";
+      height: 14px; width: 14px;
+      left: 3px; bottom: 3px;
+      background: var(--danger); transition: .3s; border-radius: 50%;
     }
-    input:checked + .slider { background-color: #22c55e; }
-    input:checked + .slider:before { transform: translateX(22px); }
+    input:checked + .slider { background: #0e2a1a; border-color: #1a3a2a; }
+    input:checked + .slider::before { transform: translateX(20px); background: var(--success); }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px);} to { opacity: 1; transform: translateY(0);} }
+    /* ── URL chip ── */
+    .url-chip {
+      font-family: var(--mono);
+      font-size: 11px; color: var(--muted);
+      max-width: 260px; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
+    }
+    .url-chip span { color: var(--accent); opacity: .7; }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .shell { padding: 18px; }
-      .title { font-size: 22px; }
-      .shell-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .table-responsive { overflow-x: auto; }
+    /* ── Actions ── */
+    .actions { display: flex; gap: 6px; flex-wrap: nowrap; }
+
+    /* ── Modal overlay ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 24px;
+    }
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%; max-width: 780px;
+      max-height: 90vh;
+      display: flex; flex-direction: column;
+      animation: slideUp .25s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px; border-bottom: 1px solid var(--border);
+    }
+    .modal-head h2 {
+      font-family: var(--mono); font-size: 14px; color: var(--accent);
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .modal-body {
+      padding: 22px; overflow-y: auto; flex: 1;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .modal-foot {
+      padding: 16px 22px; border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    /* ── Form tabs ── */
+    .tab-bar {
+      display: flex; gap: 2px;
+      margin-bottom: 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 4px;
+    }
+    .tab-btn {
+      flex: 1; padding: 8px 6px;
+      background: transparent; border: none; cursor: pointer;
+      font-family: var(--mono); font-size: 10px; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--muted);
+      border-radius: 5px; transition: all .2s;
+    }
+    .tab-btn.active {
+      background: var(--surface); color: var(--accent);
+      box-shadow: 0 2px 8px rgba(0,0,0,.4);
+    }
+    .tab-btn:hover:not(.active) { color: var(--txt); }
+
+    /* ── Form elements ── */
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block; font-size: 11px; font-family: var(--mono);
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .field .hint {
+      font-size: 11px; color: var(--muted); margin-top: 5px; line-height: 1.5;
+    }
+    .field .hint code {
+      font-family: var(--mono); font-size: 10px;
+      background: var(--surface2); padding: 1px 5px; border-radius: 3px;
+      color: var(--accent);
+    }
+    input[type=text], input[type=url], select, textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px; color: var(--txt);
+      font-family: var(--sans); font-size: 13px;
+      padding: 10px 12px; outline: none; transition: border .2s;
+    }
+    input[type=text]:focus, input[type=url]:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+    textarea { font-family: var(--mono); font-size: 12px; resize: vertical; }
+    select option { background: var(--surface2); }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+    /* ── Result modal ── */
+    .result-box {
+      font-family: var(--mono);
+      font-size: 12px; line-height: 1.7;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px;
+      white-space: pre-wrap; word-break: break-all;
+      max-height: 400px; overflow-y: auto;
+      color: #a5f3fc;
+    }
+    .result-label {
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
+    }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center; padding: 60px 20px;
+      color: var(--muted); font-size: 14px;
+    }
+    .empty .big { font-size: 40px; margin-bottom: 12px; }
+
+    /* ── Separator ── */
+    .section-sep {
+      font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent2);
+      border-bottom: 1px solid var(--border); padding-bottom: 6px;
+      margin-bottom: 16px; margin-top: 4px;
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 640px) {
+      .row-2, .row-3 { grid-template-columns: 1fr; }
+      .url-chip { max-width: 140px; }
+      .tab-btn { font-size: 9px; }
     }
   </style>
 </head>
-<body x-data="app()">
-  <div class="shell">
-    <div class="shell-header">
-      <div>
-        <div class="title">API Wrapper Admin</div>
-        <div class="subtitle">Manage and configure your API environment</div>
-      </div>
-      <button class="btn-primary-gradient" @click="openCreate()">+ New Config</button>
-    </div>
+<body x-data="app()" x-init="init()">
+<div class="wrap">
 
-    <div class="card-like">
-      <div class="table-responsive">
-        <table class="table align-middle">
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Name</th>
-              <th>Method</th>
-              <th>Endpoint</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template x-for="c in configs" :key="c.id">
-              <tr>
-                <td x-text="c.id"></td>
-                <td x-text="c.name"></td>
-                <td><span class="badge text-bg-dark" x-text="c.method"></span></td>
-                <td x-text="c.url"></td>
-                <td>
-                  <label class="switch">
-                    <input type="checkbox" :checked="c.enabled" @change="toggle(c)">
-                    <span class="slider"></span>
-                  </label>
-                </td>
-                <td class="d-flex gap-2">
-                  <button class="btn btn-sm btn-outline-primary" @click="edit(c)">Edit</button>
-                  <button class="btn btn-sm btn-outline-success" @click="execute(c.id)">Run</button>
-                  <button class="btn btn-sm btn-outline-danger" @click="remove(c.id)">Delete</button>
-                  <button class="btn btn-sm btn-outline-secondary" @click="cloneConfig(c.id)">Clone</button>
-                </td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
-      </div>
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="logo-area">
+      <h1>// API WRAPPER ADMIN</h1>
+      <p>Configure, transform, and proxy your API integrations</p>
     </div>
-
-    <div class="mt-3 subtitle">Secure • Fast • Centralized Control</div>
+    <button class="btn btn-accent" @click="openCreate()">+ New Config</button>
   </div>
 
-  <!-- Modal -->
-  <div class="modal fade" id="configModal">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Config</h5>
-          <button class="btn-close" data-bs-dismiss="modal"></button>
+  <!-- Table -->
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Method</th>
+          <th>Endpoint</th>
+          <th>Features</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-if="configs.length === 0">
+          <tr><td colspan="7">
+            <div class="empty">
+              <div class="big">⚡</div>
+              No configs yet — create your first API wrapper
+            </div>
+          </td></tr>
+        </template>
+        <template x-for="c in configs" :key="c.id">
+          <tr>
+            <td style="color:var(--muted);font-family:var(--mono);font-size:12px" x-text="c.id"></td>
+            <td style="font-weight:600" x-text="c.name"></td>
+            <td><span class="badge" :class="'badge-' + c.method" x-text="c.method"></span></td>
+            <td>
+              <div class="url-chip" :title="c.url">
+                <span x-text="c.url.replace(/^https?:\/\//,'').split('/')[0]"></span><span x-text="'/' + c.url.replace(/^https?:\/\//,'').split('/').slice(1).join('/')"></span>
+              </div>
+            </td>
+            <td>
+              <div class="feat-dots" title="">
+                <span class="dot" :class="c.path_params_schema   ? 'dot-active' : 'dot-inactive'" title="Path Params"></span>
+                <span class="dot" :class="c.query_params_schema  ? 'dot-active' : 'dot-inactive'" title="Query Params"></span>
+                <span class="dot" :class="c.body_transform       ? 'dot-active' : 'dot-inactive'" title="Body Transform"></span>
+                <span class="dot" :class="c.response_transform   ? 'dot-active' : 'dot-inactive'" title="Response Transform"></span>
+                <span class="dot" :class="c.header_transform     ? 'dot-active' : 'dot-inactive'" title="Header Transform"></span>
+                <span class="dot" :class="c.sample_payload       ? 'dot-active' : 'dot-inactive'" title="Sample Payload"></span>
+              </div>
+            </td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" :checked="c.enabled" @change="toggle(c)">
+                <span class="slider"></span>
+              </label>
+            </td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-ghost btn-sm"   @click="edit(c)">Edit</button>
+                <button class="btn btn-success btn-sm" @click="runSample(c.id)">Sample</button>
+                <button class="btn btn-warn btn-sm"    @click="dryRun(c.id)">Dry Run</button>
+                <button class="btn btn-purple btn-sm"  @click="cloneConfig(c.id)">Clone</button>
+                <button class="btn btn-danger btn-sm"  @click="remove(c.id)">Del</button>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ═══════════════════ CONFIG MODAL ═══════════════════ -->
+<div class="modal-overlay" x-show="showModal" x-cloak @click.self="showModal=false" style="display:none">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 x-text="form.id ? '// edit config' : '// new config'"></h2>
+      <button class="btn btn-ghost btn-sm" @click="showModal=false">✕ Close</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn" :class="tab==='basic'?'active':''"      @click="tab='basic'">Basic</button>
+        <button class="tab-btn" :class="tab==='auth'?'active':''"       @click="tab='auth'">Auth</button>
+        <button class="tab-btn" :class="tab==='params'?'active':''"     @click="tab='params'">Params</button>
+        <button class="tab-btn" :class="tab==='transform'?'active':''"  @click="tab='transform'">Transform</button>
+        <button class="tab-btn" :class="tab==='sample'?'active':''"     @click="tab='sample'">Sample</button>
+      </div>
+
+      <!-- ── BASIC ── -->
+      <div x-show="tab==='basic'">
+        <div class="row-2">
+          <div class="field">
+            <label>Name *</label>
+            <input type="text" x-model="form.name" placeholder="my_api_wrapper" />
+          </div>
+          <div class="field">
+            <label>Method *</label>
+            <select x-model="form.method">
+              <option>GET</option><option>POST</option>
+              <option>PUT</option><option>PATCH</option><option>DELETE</option>
+            </select>
+          </div>
         </div>
-        <div class="modal-body">
-          <input class="form-control mb-2" placeholder="Name" x-model="form.name" required>
-          <input class="form-control mb-2" placeholder="Full URL (https://api.example.com/users)"
-                 x-model="form.url" type="url" required>
-          <select class="form-control mb-2" x-model="form.method">
-            <option>GET</option>
-            <option>POST</option>
-            <option>PUT</option>
-            <option>DELETE</option>
+        <div class="field">
+          <label>URL Template *</label>
+          <input type="text" x-model="form.url"
+                 placeholder="https://api.example.com/users/{user_id}/posts" />
+          <p class="hint">Use <code>{param_name}</code> for path parameters. Define their sources in the <strong>Params</strong> tab.</p>
+        </div>
+        <div class="field">
+          <label>Static Headers (JSON object)</label>
+          <textarea rows="3" x-model="form.headers"
+                    placeholder='{"Content-Type": "application/json", "X-App-Id": "abc"}'></textarea>
+          <p class="hint">Always-sent headers. For dynamic headers from payload use the <strong>Transform</strong> tab.</p>
+        </div>
+      </div>
+
+      <!-- ── AUTH ── -->
+      <div x-show="tab==='auth'">
+        <div class="field">
+          <label>Auth Type</label>
+          <select x-model="form.auth_type">
+            <option value="">None</option>
+            <option value="bearer">Bearer Token</option>
+            <option value="basic">Basic (user:pass)</option>
+            <option value="api_key">API Key Header</option>
           </select>
-          <label>Headers (JSON)</label>
-          <textarea class="form-control mb-3" rows="3" x-model="form.headers"></textarea>
-          <label>Response Mapping (JSON)</label>
-          <textarea class="form-control" rows="3" x-model="form.response_mapping"></textarea>
         </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" @click="save()">Save</button>
+        <div class="field" x-show="form.auth_type">
+          <label>Auth Value</label>
+          <input type="text" x-model="form.auth_value"
+                 :placeholder="form.auth_type==='basic' ? 'username:password' : form.auth_type==='bearer' ? 'your-token' : 'your-api-key'" />
+        </div>
+        <div class="field" x-show="form.auth_type==='api_key'">
+          <label>Header Name</label>
+          <input type="text" x-model="form.auth_header_name" placeholder="X-API-Key" />
+          <p class="hint">The request header to place the API key in. Defaults to <code>X-API-Key</code>.</p>
+        </div>
+      </div>
+
+      <!-- ── PARAMS ── -->
+      <div x-show="tab==='params'">
+        <div class="section-sep">Path Parameters</div>
+        <div class="field">
+          <label>Path Params Schema (JSON array)</label>
+          <textarea rows="5" x-model="form.path_params_schema"
+                    placeholder='[
+  {"name": "user_id", "source": "user_id"},
+  {"name": "post_id", "source": "post.id"}
+]'></textarea>
+          <p class="hint">
+            Each entry: <code>name</code> matches <code>{name}</code> in the URL; <code>source</code> is a dot-path into the call payload.
+            Use <code>$LITERAL:value</code> for hardcoded values.
+          </p>
+        </div>
+
+        <div class="section-sep">Query Parameters</div>
+        <div class="field">
+          <label>Query Params Schema (JSON array)</label>
+          <textarea rows="6" x-model="form.query_params_schema"
+                    placeholder='[
+  {"name": "limit",  "value": "10"},
+  {"name": "status", "source": "filter.status"},
+  {"name": "page",   "source": "page"}
+]'></textarea>
+          <p class="hint">
+            Static: use <code>value</code>. Dynamic from payload: use <code>source</code> (dot-path or JMESPath).
+          </p>
+        </div>
+      </div>
+
+      <!-- ── TRANSFORM ── -->
+      <div x-show="tab==='transform'">
+        <div class="section-sep">Header Transform</div>
+        <div class="field">
+          <label>Header Transform (JSON object)</label>
+          <textarea rows="4" x-model="form.header_transform"
+                    placeholder='{"X-Tenant-Id": "tenant_id", "X-User": "user.email"}'></textarea>
+          <p class="hint">Map response headers dynamically from the call payload. Values are dot-paths.</p>
+        </div>
+
+        <div class="section-sep">Body Transform</div>
+        <div class="field">
+          <label>Body Transform (JSON object)</label>
+          <textarea rows="5" x-model="form.body_transform"
+                    placeholder='{"username": "user.name", "email": "user.email", "role": "$LITERAL:viewer"}'></textarea>
+          <p class="hint">
+            Maps call payload fields → outgoing request body.
+            Omit to pass payload as-is, or set <code>{"$PASSTHROUGH": true}</code> explicitly.
+            Use <code>$LITERAL:value</code> for constants.
+          </p>
+        </div>
+
+        <div class="section-sep">Response Transform</div>
+        <div class="field">
+          <label>Response Transform (JSON object)</label>
+          <textarea rows="5" x-model="form.response_transform"
+                    placeholder='{"userId": "data.id", "fullName": "data.attributes.name", "email": "data.attributes.email"}'></textarea>
+          <p class="hint">
+            Maps upstream API response fields → your returned response.
+            Omit to return raw response, or use <code>{"$PASSTHROUGH": true}</code>.
+            Supports JMESPath: <code>items[0].id</code>.
+          </p>
+        </div>
+      </div>
+
+      <!-- ── SAMPLE ── -->
+      <div x-show="tab==='sample'">
+        <div class="field">
+          <label>Sample Payload (JSON object)</label>
+          <textarea rows="10" x-model="form.sample_payload"
+                    placeholder='{
+  "user_id": 42,
+  "tenant_id": "acme-corp",
+  "filter": {"status": "active"},
+  "page": 1,
+  "user": {"name": "Jane Doe", "email": "jane@example.com"}
+}'></textarea>
+          <p class="hint">
+            A representative call payload used for the <strong>Sample</strong> run and <strong>Dry Run</strong> buttons.
+            All transform source paths are resolved against this object.
+          </p>
+        </div>
+        <div class="field" x-show="form.id">
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-success btn-sm" @click="runSample(form.id)">▶ Run with Sample</button>
+            <button class="btn btn-warn btn-sm"    @click="dryRun(form.id)">🔍 Dry Run</button>
+          </div>
+          <p class="hint" style="margin-top:8px">Run directly from this tab to test your configuration.</p>
         </div>
       </div>
     </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost" @click="showModal=false">Cancel</button>
+      <button class="btn btn-accent" @click="save()">Save Config</button>
+    </div>
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    function app(){
-      return {
-        configs: [],
-        form: {},
-        modal: null,
-        init(){
-          this.modal = new bootstrap.Modal(document.getElementById('configModal'));
-          this.fetchConfigs();
-        },
-        async fetchConfigs(){
-          let res = await fetch('/configs');
-          this.configs = await res.json();
-        },
-        openCreate(){
-          this.form = {method: 'GET', headers: '{}', response_mapping: '{}'};
-          this.modal.show();
-        },
-        edit(c){
-          this.form = JSON.parse(JSON.stringify(c));
-          this.modal.show();
-        },
-        async cloneConfig(id){
-          await fetch(`/configs/${id}/clone`, { method: 'POST' });
-          this.fetchConfigs();
-        },
+<!-- ═══════════════════ RESULT MODAL ═══════════════════ -->
+<div class="modal-overlay" x-show="showResult" x-cloak @click.self="showResult=false" style="display:none">
+  <div class="modal-box" style="max-width:680px">
+    <div class="modal-head">
+      <h2 x-text="resultTitle"></h2>
+      <button class="btn btn-ghost btn-sm" @click="showResult=false">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <div class="result-label" x-text="resultSubtitle"></div>
+      <div class="result-box" x-text="resultText"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" @click="copyResult()">Copy JSON</button>
+      <button class="btn btn-accent" @click="showResult=false">Done</button>
+    </div>
+  </div>
+</div>
 
-        async save(){
-          const name = (this.form.name || '').trim();
-          const url  = (this.form.url  || '').trim();
-          if(!name || !url){ alert('Name and URL are required.'); return; }
-          try { new URL(url); } catch(e){ alert('Please enter a valid URL.'); return; }
+<script>
+function app() {
+  return {
+    configs: [],
+    showModal: false,
+    showResult: false,
+    tab: 'basic',
+    form: {},
+    resultTitle: '',
+    resultSubtitle: '',
+    resultText: '',
 
-          const method = this.form.id ? 'PUT' : 'POST';
-          const endpoint = this.form.id ? `/configs/${this.form.id}` : '/configs';
-          await fetch(endpoint,{ method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(this.form) });
-          this.modal.hide();
-          this.fetchConfigs();
-        },
-        async remove(id){
-          if(!confirm('Delete config?')) return;
-          await fetch(`/configs/${id}`, { method: 'DELETE' });
-          this.fetchConfigs();
-        },
-        async execute(id){
-          let res = await fetch(`/execute/${id}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: '{}'
-          });
-          alert(JSON.stringify(await res.json(), null, 2));
-        },
-        async toggle(config){
-          await fetch(`/configs/${config.id}/toggle`, { method: 'PATCH' });
-          config.enabled = !config.enabled;
+    async init() {
+      await this.fetchConfigs();
+    },
+
+    async fetchConfigs() {
+      const res = await fetch('/configs');
+      this.configs = await res.json();
+    },
+
+    openCreate() {
+      this.form = {
+        method: 'GET',
+        headers: '',
+        auth_type: '',
+        auth_value: '',
+        auth_header_name: '',
+        header_transform: '',
+        path_params_schema: '',
+        query_params_schema: '',
+        body_transform: '',
+        response_transform: '',
+        sample_payload: '',
+      };
+      this.tab = 'basic';
+      this.showModal = true;
+    },
+
+    edit(c) {
+      this.form = JSON.parse(JSON.stringify(c));
+      this.tab = 'basic';
+      this.showModal = true;
+    },
+
+    async save() {
+      const name = (this.form.name || '').trim();
+      const url  = (this.form.url  || '').trim();
+      if (!name || !url) { alert('Name and URL are required.'); return; }
+
+      // Validate JSON fields
+      const jsonFields = ['headers', 'header_transform', 'path_params_schema',
+                          'query_params_schema', 'body_transform',
+                          'response_transform', 'sample_payload'];
+      for (const f of jsonFields) {
+        const v = (this.form[f] || '').trim();
+        if (v) {
+          try { JSON.parse(v); }
+          catch(e) { alert(`Invalid JSON in "${f}":\n${e.message}`); return; }
         }
       }
-    }
-  </script>
+
+      const method   = this.form.id ? 'PUT' : 'POST';
+      const endpoint = this.form.id ? `/configs/${this.form.id}` : '/configs';
+
+      const res = await fetch(endpoint, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(this.form),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert('Error: ' + (err.error || res.statusText));
+        return;
+      }
+
+      this.showModal = false;
+      await this.fetchConfigs();
+    },
+
+    async remove(id) {
+      if (!confirm('Delete this config? This cannot be undone.')) return;
+      await fetch(`/configs/${id}`, { method: 'DELETE' });
+      await this.fetchConfigs();
+    },
+
+    async toggle(config) {
+      await fetch(`/configs/${config.id}/toggle`, { method: 'PATCH' });
+      config.enabled = !config.enabled;
+    },
+
+    async cloneConfig(id) {
+      const res = await fetch(`/configs/${id}/clone`, { method: 'POST' });
+      if (res.ok) await this.fetchConfigs();
+      else alert('Clone failed.');
+    },
+
+    async runSample(id) {
+      this.resultTitle    = '// SAMPLE RUN';
+      this.resultSubtitle = `POST /execute/${id}/sample — using stored sample_payload`;
+      this.resultText     = 'Loading…';
+      this.showResult     = true;
+
+      try {
+        const res = await fetch(`/execute/${id}/sample`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: '{}',
+        });
+        const data = await res.json();
+        this.resultText = JSON.stringify(data, null, 2);
+      } catch(e) {
+        this.resultText = 'Error: ' + e.message;
+      }
+    },
+
+    async dryRun(id) {
+      this.resultTitle    = '// DRY RUN';
+      this.resultSubtitle = `POST /execute/${id}/dry-run — resolved request (no HTTP call made)`;
+      this.resultText     = 'Loading…';
+      this.showResult     = true;
+
+      try {
+        const res = await fetch(`/execute/${id}/dry-run`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: '{}',
+        });
+        const data = await res.json();
+        this.resultText = JSON.stringify(data, null, 2);
+      } catch(e) {
+        this.resultText = 'Error: ' + e.message;
+      }
+    },
+
+    copyResult() {
+      navigator.clipboard.writeText(this.resultText).then(() => {
+        alert('Copied to clipboard!');
+      });
+    },
+  }
+}
+</script>
 </body>
 </html>
