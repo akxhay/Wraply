@@ -18,6 +18,6 @@ def create_app():
 
     @app.route("/")
     def home():
-        return "<h2>API Wrapper Running</h2><a href='/configs'>Configs</a>"
+        return "<h2>API Wrapper Running</h2><a href='/configs/ui'>Configs</a>"
 
     return app
