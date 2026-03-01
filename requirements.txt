@@ -1,0 +1,7 @@
+pydantic
+httpx
+jinja2
+python-multipart
+flask
+flask_sqlalchemy
+httpx
