@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from ..utils import serialize_model, serialize_list
 from ..crud import (
     create_config,
     get_all_configs,
@@ -12,8 +13,7 @@ config_bp = Blueprint("configs", __name__, url_prefix="/configs")
 @config_bp.route("", methods=["GET"])
 def list_configs():
     configs = get_all_configs()
-    return jsonify([c.__dict__ for c in configs])
-
+    return jsonify(serialize_list(configs))
 
 @config_bp.route("", methods=["POST"])
 def create():
