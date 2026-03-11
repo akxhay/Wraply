@@ -187,7 +187,7 @@ async def execute_api(config, payload: dict = None):
     query_params = _build_query_params(config, payload)
     body = _build_body(config, payload)
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(verify=False) as client:
         response = await client.request(
             config.method,
             url,
