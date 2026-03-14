@@ -1,9 +1,21 @@
 import json
 from flask import Blueprint, request, jsonify
+
 from ..crud import get_config
 from ..executor import execute_sync
+from ..models import APIConfig
+from ..utils import to_original_shape
 
 execute_bp = Blueprint("execute", __name__, url_prefix="/execute")
+
+
+@execute_bp.route("", methods=["POST"])
+def create():
+    data = request.json
+    original_data = to_original_shape(data)
+    config = APIConfig(**original_data)
+    result = execute_sync(config, config.sample_payload)
+    return jsonify(result)
 
 
 @execute_bp.route("/<int:id>", methods=["POST"])
